@@ -101,18 +101,20 @@ h1 {
 
 .beat {
     position: absolute;
-    background: rgba(255, 255, 255, 0.05);
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     padding: 1.5rem;
     transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
     width: 280px;
     transform-origin: center;
+    will-change: transform;
 }
 
 .beat:hover {
-    transform: scale(1.05) rotate(var(--rotation));
+    transform: var(--transform-base, translate(0, 0)) scale(1.05) !important;
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(102, 126, 234, 0.3);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);

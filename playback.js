@@ -1,6 +1,7 @@
-window.addEventListener('load', function () {
+window.addEventListener('DOMContentLoaded', function () {
     const audios = document.querySelectorAll('audio');
     const beats = document.querySelectorAll('.beat');
+    let currentPlayingBeat = null; // Track currently playing beat
 
     // Array of dark gradient backgrounds for each song
     const backgrounds = [
@@ -16,40 +17,45 @@ window.addEventListener('load', function () {
 
     let currentBackgroundIndex = 0;
 
+    // Debounce function for better performance
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
     // Jackson Pollock style random positioning
     function positionBeatsRandomly() {
         const container = document.getElementById('beats');
-        const containerWidth = window.innerWidth - 400; // Leave margin for beat width
-        const beatHeight = 200; // Approximate beat height
-        const positions = [];
+        const containerWidth = window.innerWidth - 400;
+        let maxY = 0;
 
-        beats.forEach((beat, index) => {
-            // Random position - more clustered
+        for (let i = 0; i < beats.length; i++) {
+            const beat = beats[i];
             const x = Math.random() * containerWidth;
-            const y = (index * 100) + (Math.random() * 200 - 100); // Closer vertical spacing with less randomness
+            const y = (i * 100) + (Math.random() * 200 - 100);
+            const rotation = (Math.random() * 20 - 10);
 
-            // Random rotation
-            const rotation = (Math.random() * 20 - 10) + 'deg'; // -10 to +10 degrees
+            const transformValue = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
+            beat.style.cssText = `transform: ${transformValue}; --transform-base: ${transformValue};`;
 
-            beat.style.left = x + 'px';
-            beat.style.top = y + 'px';
-            beat.style.transform = `rotate(${rotation})`;
-            beat.style.setProperty('--rotation', rotation);
-        });
-
-        // Adjust container height based on last element
-        const lastBeat = beats[beats.length - 1];
-        if (lastBeat) {
-            const lastBeatBottom = parseFloat(lastBeat.style.top) + 250;
-            container.style.minHeight = lastBeatBottom + 'px';
+            if (y > maxY) maxY = y;
         }
+
+        container.style.minHeight = (maxY + 250) + 'px';
     }
 
-    // Position on load
+    // Position immediately
     positionBeatsRandomly();
 
-    // Reposition on window resize
-    window.addEventListener('resize', positionBeatsRandomly);
+    // Reposition on window resize with debouncing (300ms)
+    window.addEventListener('resize', debounce(positionBeatsRandomly, 300));
 
     // Auto-play next track when current ends
     audios.forEach((audio, i) => {
@@ -73,10 +79,13 @@ window.addEventListener('load', function () {
             // Add now-playing class to current beat
             const beatDiv = audio.closest('.beat');
             if (beatDiv) {
-                // Remove now-playing from all beats
-                document.querySelectorAll('.beat').forEach(b => b.classList.remove('now-playing'));
+                // Remove now-playing from previous beat only (optimization)
+                if (currentPlayingBeat && currentPlayingBeat !== beatDiv) {
+                    currentPlayingBeat.classList.remove('now-playing');
+                }
                 // Add to current beat
                 beatDiv.classList.add('now-playing');
+                currentPlayingBeat = beatDiv;
 
                 // Update URL hash when playing
                 if (beatDiv.id) {
