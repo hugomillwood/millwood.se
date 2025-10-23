@@ -125,9 +125,14 @@ window.addEventListener('DOMContentLoaded', function () {
             if (beatDiv) {
                 const audio = beatDiv.querySelector('audio');
                 if (audio) {
-                    // Scroll to the beat
-                    beatDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Play after a brief delay to ensure scrolling
+                    // Highlight the beat immediately (will be centered via CSS)
+                    if (currentPlayingBeat && currentPlayingBeat !== beatDiv) {
+                        currentPlayingBeat.classList.remove('now-playing');
+                    }
+                    beatDiv.classList.add('now-playing');
+                    currentPlayingBeat = beatDiv;
+
+                    // Play after a brief delay to ensure CSS transition
                     setTimeout(() => {
                         const playPromise = audio.play();
                         if (playPromise !== undefined) {

@@ -129,7 +129,13 @@ h1 {
 .beat.now-playing {
     border-width: 2px;
     animation: rainbowBorder 3s linear infinite;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 60px rgba(102, 126, 234, 0.4);
+    transform: translate(-50%, -50%) scale(1.15) !important;
+    z-index: 200;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes highlight {
